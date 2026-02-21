@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeShield AI | Health Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+            color: var(--text-main);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @media (max-width: 850px) {
+            .container { grid-template-columns: 1fr; }
+        }
+
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #818cf8, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            color: white;
+            font-family: inherit;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), #4f46e5);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px var(--primary-glow);
+        }
+
+        button:active { transform: translateY(0); }
+
+        /* Results Panel */
+        .results-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .placeholder-content {
+            text-align: center;
+            color: var(--text-dim);
+        }
+
+        .placeholder-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 99px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
+        }
+
+        .risk-low { background: rgba(16, 185, 129, 0.2); color: var(--accent-success); border: 1px solid var(--accent-success); }
+        .risk-moderate { background: rgba(245, 158, 11, 0.2); color: var(--accent-warning); border: 1px solid var(--accent-warning); }
+        .risk-high { background: rgba(239, 68, 68, 0.2); color: var(--accent-danger); border: 1px solid var(--accent-danger); }
+
+        .score-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 8px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 2rem;
+            position: relative;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+        }
+
+        .score-value { font-size: 3.5rem; font-weight: 700; line-height: 1; }
+        .score-label { font-size: 0.8rem; color: var(--text-dim); margin-top: 0.2rem; }
+
+        .recommendation-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 0 16px 16px 0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .loader {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            display: none;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .hidden { display: none !important; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.03);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-val { display: block; font-weight: 700; font-size: 1.2rem; margin-bottom: 0.2rem; }
+        .stat-lab { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Input Panel -->
+        <div class="glass-panel">
+            <h1>LifeShield <span style="-webkit-text-fill-color: var(--text-main); font-weight: 300;">AI</span></h1>
+            <p class="subtitle">Next-gen biometric health risk assessment.</p>
+            
+            <form id="healthForm">
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" id="age" required min="1" max="120" placeholder="e.g. 35">
+                </div>
+                
+                <div class="form-group">
+                    <label>BMI (Body Mass Index)</label>
+                    <input type="number" step="0.1" id="bmi" required placeholder="e.g. 24.5">
+                </div>
+
+                <div class="form-group">
+                    <label>General Health Rating</label>
+                    <select id="genhlth">
+                        <option value="1">1 - Excellent</option>
+                        <option value="2">2 - Very Good</option>
+                        <option value="3" selected>3 - Good</option>
+                        <option value="4">4 - Fair</option>
+                        <option value="5">5 - Poor</option>
+                    </select>
+                </div>
+
+                <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select id="gender">
+                            <option value="1">Male</option>
+                            <option value="0">Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Smoker Status</label>
+                        <select id="smoker">
+                            <option value="0">Never Smoked</option>
+                            <option value="1">Current Smoker</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn">
+                    <span id="btnText">Analyze Bio-Risk</span>
+                    <div class="loader" id="loader"></div>
+                </button>
+            </form>
+        </div>
+
+        <!-- Output Panel -->
+        <div class="glass-panel results-panel">
+            <!-- Placeholder -->
+            <div id="placeholder" class="placeholder-content">
+                <div class="placeholder-icon">🧬</div>
+                <h3>Awaiting Data</h3>
+                <p>Fill in your health metrics and click analyze to generate your biological risk profile.</p>
+            </div>
+
+            <!-- Real Results -->
+            <div id="results" class="hidden" style="text-align: center;">
+                <div id="riskBadge" class="risk-badge">Low Risk</div>
+                
+                <div class="score-circle">
+                    <span class="score-value" id="vitalityVal">85</span>
+                    <span class="score-label">VITALITY SCORE</span>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-val" id="probVal">15%</span>
+                        <span class="stat-lab">Risk Probability</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val" id="confVal">92%</span>
+                        <span class="stat-lab">AI Confidence</span>
+                    </div>
+                </div>
+
+                <div class="recommendation-card">
+                    <h4 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--primary);">AI RECOMMENDATION</h4>
+                    <span id="recText">Loading analysis...</span>
+                </div>
+
+                <button onclick="resetForm()" style="background: transparent; border: 1px solid rgba(255,255,255,0.1); margin-top: 2rem;">New Analysis</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/predict';
+
+        document.getElementById('healthForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const loader = document.getElementById('loader');
+            const btnText = document.getElementById('btnText');
+            
+            // UI Loading State
+            submitBtn.disabled = true;
+            btnText.textContent = 'Analyzing...';
+            loader.style.display = 'block';
+
+            const payload = {
+                features: {
+                    age: parseInt(document.getElementById('age').value),
+                    bmi: parseFloat(document.getElementById('bmi').value),
+                    genhlth: parseInt(document.getElementById('genhlth').value),
+                    gender: parseInt(document.getElementById('gender').value),
+                    smoker: parseInt(document.getElementById('smoker').value),
+                    // Adding defaults for columns not in UI to ensure balance
+                    income: 50000, 
+                    physhlth: 0,
+                    menthlth: 0
+                }
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('Prediction failed');
+
+                const data = await response.json();
+                showResults(data);
+            } catch (err) {
+                alert('Analysis failed. Make sure the backend server is running.');
+                console.error(err);
+            } finally {
+                submitBtn.disabled = false;
+                btnText.textContent = 'Analyze Bio-Risk';
+                loader.style.display = 'none';
+            }
+        });
+
+        function showResults(data) {
+            document.getElementById('placeholder').classList.add('hidden');
+            document.getElementById('results').classList.remove('hidden');
+
+            // Set Values
+            document.getElementById('vitalityVal').textContent = Math.round(data.vitality_score);
+            document.getElementById('probVal').textContent = (data.risk_probability * 100).toFixed(1) + '%';
+            document.getElementById('confVal').textContent = (data.confidence * 100).toFixed(1) + '%';
+            document.getElementById('recText').textContent = data.recommendation;
+
+            // Set Badge Style
+            const badge = document.getElementById('riskBadge');
+            badge.textContent = data.risk_level + ' Risk';
+            badge.className = 'risk-badge risk-' + data.risk_level.toLowerCase();
+            
+            // Animation for score
+            animateValue("vitalityVal", 0, Math.round(data.vitality_score), 1000);
+        }
+
+        function resetForm() {
+            document.getElementById('healthForm').reset();
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('placeholder').classList.remove('hidden');
+        }
+
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+    </script>
+</body>
+</html>
